@@ -1,0 +1,44 @@
+<section class="vh-100">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-xl-10">
+        <div class="card" style="border-radius: 1rem;">
+          <div class="row g-0">
+            <div class="col-md-6 col-lg-5 d-none d-md-block">         
+                  <%#= image_tag("login.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+            </div>
+            <div class="col-md-6 col-lg-7 d-flex align-items-center">
+              <div class="card-body p-4 p-lg-5">
+                  <div class="d-flex align-items-center mb-3 pb-1">
+                    <span class="h1 fw-bold mb-0">Sign In</span>
+                  </div>
+
+                  <%= form_with url:sign_in_path, data: {turbo: true} do |form| %>
+                  <div class="form-outline mb-4">
+                  <%= form.label :email %>
+                  <%= form.email_field :email, class: "form-control", placeholder: "user@example.com" %>
+                  </div>
+
+                  <div class="form-outline mb-4">
+                    <%= form.label :password %>
+                    <%= form.password_field :password, class: "form-control", placeholder: "password" %>
+                  </div>
+
+                  <div class="mb-3">
+                    <%= form.submit "Sign In", class: "btn btn-primary" %>
+                  </div>
+                  <% end %>
+                    <%= link_to "Don't have an account yet?", sign_up_path %>
+        
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </br>
+      </br>
+    </div>
+    
+  </div>
+</section>
