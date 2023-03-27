@@ -1,0 +1,36 @@
+<div class="container">
+<h1>This is <%=@product.name%> bidding page.</h1>
+<% if Current.user.role == 'bidder' %>
+
+<!---ASSOCIATE THE PRODUCT ID WITH THE NEW BID--->
+
+<p><strong>ITEM: </strong><%=@product.name%></p>
+        <p class="card-text"><strong>DESCRIPTION:</strong>
+        <%=@product.description %>
+        </p>
+        <% if (Time.zone.now - @product.created_at) > 3.day %>
+          <h7 class="card-title"><%=@product.created_at.strftime("%B %d %Y")%></h7>
+        <% else %>
+          <h7 class="card-title"><%=time_ago_in_words(@product.created_at)%> ago</h7>
+        <% end %>
+      </br></br>
+      <p><strong>Lowest Allowable Bid: </strong><%= @product.lowest_allowable_bid %></p>
+      <p><strong>Starting Bid Price: </strong><%= @product.starting_bid_price%></p>
+      <p><strong>Current Lowest Bid: </strong><%= @product.current_lowest_bid%></p>
+      <p><strong>Bidding Expiration: </strong><%= @product.bidding_expiration.strftime("%B %d, %Y at %I:%M %p") %></p>
+
+<% end %>
+  
+<h2>Bids:</h2>
+<ul>
+  <% @product.biddings.each do |bidding| %>
+    <li>
+      <%= bidding.bid_amount %> by <%= bidding.user.username %>
+    </li>
+  <% end %>
+</ul>
+
+
+</div>
+</br>
+</br>

@@ -7,7 +7,7 @@ class RegistrationsController < ApplicationController
        @user = User.new(user_params)
        if @user.save
         # session[:user_id] = @user.id #to check if logged in
-        redirect_to sign_up_path, notice: "Successfully created account"
+        redirect_to sign_in_path, notice: "Successfully created account"
        else
             render :new, status: 422
        end

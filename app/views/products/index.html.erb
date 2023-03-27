@@ -1,1 +1,306 @@
 <h1>DASHBOARD</h1>
+<%= link_to 'Add Item',new_product_path, {:class => 'btn btn-outline-primary m-3'}%>
+<div class="container">
+<div class="row row-cols-1 row-cols-md-3 g-4">
+<% @products.each do|product| %>
+  <div class="col">
+
+    <div class="card h-100">
+    <div class="card-header">
+    <div class="d-flex justify-content-between">
+      <div><i class="fas fa-crown"></i><strong>Current Bid: </strong> <% if product.biddings.any? %>
+        <% bidding = product.biddings.order(created_at: :desc).first %>
+        <%= bidding.user.username %>
+      <% else %>
+        <td>No bids yet</td>
+      <% end %>
+      </div>
+  
+      <div class="d-flex align-items-center">
+        <div class="ml-auto"><i class="fas fa-money-bill"></i><%= product.current_lowest_bid %></div>
+      </div>
+    </div>
+  </div>
+    <% if product.image.attached?%>
+    <%= image_tag (product.image), style:"height:410px;"%>
+    <% end %>
+
+
+    <div class="card-header">
+    <div class="d-flex justify-content-between">
+      <div>
+      <i class="fas fa-shopping-bag"></i><strong>Product: </strong>
+      <%=product.name%>
+      </div>
+      <% if product.bidding_allowed %>
+       <div class="d-flex align-items-center">
+       <i class="fas fa-stopwatch"></i>
+        <div class="timer" data-expiration-time="<%= product.bidding_expiration %>"></div>
+      </div>
+        <% if Current.user.role == 'auctioneer' %>
+        <%= button_to "Stop Bidding", stop_bidding_product_path(product), method: :put, class: "btn btn-danger stop-bidding-button", id: "stop-bidding-button" %>
+        <% end %>
+        <% else %>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-stopwatch"></i>
+          <span class="ml-2">Ended</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+
+
+
+
+
+  <ul class="list-group list-group-flush">
+
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+      <i class="fas fa-user"></i><strong>Posted by: </strong>
+      <span><%= product.user.username %></span>
+    </div>
+    <div>
+    <i class="fas fa-gavel"></i><strong>Starting bid:</strong>
+    <%= product.starting_bid_price%>
+    </div>
+  </li>
+
+
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+  <i class="fas fa-hourglass-end"></i></i></i>
+  <%= product.bidding_expiration.strftime("%-m/%-d/%Y at %I:%M %p") %>
+  </div>
+  <div>
+  <i class="fa fa-arrow-down"></i><strong>Minimum bid: </strong>
+  <%=product.lowest_allowable_bid%>
+  </div>
+</li>
+
+
+  <li class="list-group-item"><p class="card-text">
+  <i class="fas fa-align-left"></i><strong>Description: </strong>
+  <%=product.description %>
+  </li>
+
+  <% if product.bidding_allowed %>
+  
+  <li class="list-group-item">
+  <div class="d-flex justify-content-between">
+  
+  <button class="btn btn-link btn-light text-decoration-none text-success" data-bs-toggle="collapse" data-bs-target="#place-bid-section-<%= product.id %>" aria-expanded="true" aria-controls="place-bid-section-<%= product.id %>">
+  <h7><i class="fas fa-gavel"></i><strong>Place Bid </strong><i class="fa fa-angle-down"></i></h7>
+</button>
+  </div>
+  <div id="place-bid-section-<%= product.id %>" class="collapse">
+    <ul class="list-group">
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <div>
+            <% if product.biddings.any? %>
+              <% bidding = product.biddings.order(created_at: :desc).first %>
+              <i class="fas fa-crown"></i><strong>Current Highest Bid:</strong> <%= product.current_lowest_bid %>
+            <% else %>
+              <strong>No bids yet</strong>
+            <% end %>
+          </div>
+        </div>
+      </li>
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <div>
+          <i class="fa fa-arrow-down"></i><strong>Minimum Bid:</strong> <%= product.lowest_allowable_bid %>
+          </div>
+        </div>
+      </li>
+      <!-- Add form to place a bid here -->
+      <li class="list-group-item text-center">
+</br>
+      <%= form_with(model: [product, Bidding.new], local: true, data: { turbo: true }) do |form| %>
+        <% if form.object.errors.any? %>
+          <div class="alert alert-danger">
+            <% form.object.errors.full_messages.each do |msg| %>
+              <div><%= msg %></div>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="row">
+          <div class="col-md-8 mb-3">
+            <%= form.hidden_field :product_id, value: product.id %>
+            <%= form.hidden_field :user_id, value: Current.user.id %>
+            <div class="form-group">
+              <%= form.number_field :bid_amount, class: "form-control", placeholder: "Bid Must Be >= #{product.current_lowest_bid + product.lowest_allowable_bid}" %>
+              
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="form-group">
+              <%= form.submit "Place Bid", class: "btn btn-success btn-block" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      </li>
+    </ul>
+  </div>
+</li>
+
+
+<% end %>
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+  
+
+<!-----
+
+
+<li class="list-group-item text-center">
+</br>
+      <%= form_with(model: [product, Bidding.new], local: true, data: { turbo: true }) do |form| %>
+        <% if form.object.errors.any? %>
+          <div class="alert alert-danger">
+            <% form.object.errors.full_messages.each do |msg| %>
+              <div><%= msg %></div>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="row">
+          <div class="col-md-8 mb-3">
+            <%= form.hidden_field :product_id, value: product.id %>
+            <%= form.hidden_field :user_id, value: Current.user.id %>
+            <div class="form-group">
+              <%= form.number_field :bid_amount, class: "form-control", placeholder: "Bid Must Be => #{product.current_lowest_bid + product.lowest_allowable_bid}" %>
+              
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="form-group">
+              <%= form.submit "Place Bid", class: "btn btn-primary btn-block" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      </li>
+
+
+
+      ------>
+</ul>
+
+
+
+
+<!--
+<% if (Time.zone.now - product.created_at) > 3.day %>
+  <h7 class="card-title"><%=product.created_at.strftime("%B %d %Y")%></h7>
+<% else %>
+  <h7 class="card-title"><%=time_ago_in_words(product.created_at)%> ago</h7>
+<% end %>
+-->
+
+
+
+
+
+<!-----
+      <div class="card-body">
+  
+
+
+      <%= product.bidding_allowed %>
+      
+      </div>
+      <li style = "list-style-type: none; padding-left: 20px">
+      <div class="product-card" data-product-id="<%= product.id %>" data-bidding-expiration="<%= product.bidding_expiration %>">
+    
+    
+        <% if product.bidding_allowed %>
+            <div class="timer" data-expiration-time="<%= product.bidding_expiration %>"></div>  
+        <%= button_to "Stop Bidding", stop_bidding_product_path(product), method: :put, class: "btn btn-danger stop-bidding-button", id: "stop-bidding-button" %>
+            <% else %>
+          <p>Expired</p>
+        <% end %>
+ 
+        </div>  
+
+    <input type="hidden" class="expiration-time" value="<%= product.bidding_expiration %>">
+
+      
+            <%= link_to 'View', product, {:class => 'btn btn-light'} %>
+            <% if product.user == Current.user %>
+            <%= link_to 'Edit', edit_product_path(product), {:class => 'btn btn-light'} %>
+            <%= link_to "Delete", product, :class => 'btn btn-light', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %>
+                     
+            <% end %>
+            </li>
+        </br>
+
+        ---->
+    </div>
+
+   
+
+  </div>
+  <% end %>
+  
+</div>
+</div>
+</br>
+</br>
+
+<%= javascript_include_tag ("timer.js")%>
+
+<script>
+
+$(document).on('turbo:load', function() {
+  // Get all product cards on the page
+  console.log('Turbo loaded!');
+  var productCards = document.querySelectorAll('.product-card');
+
+  // Loop through each product card and check the expiration time
+  for (var i = 0; i < productCards.length; i++) {
+    var expirationTime = productCards[i].dataset.biddingExpiration;
+    var currentTime = new Date().getTime();
+    var timeDiff = expirationTime - currentTime;
+
+    // If the time difference is negative, hide the Stop Bidding button
+    if (timeDiff < 0) {
+      var stopBiddingButton = productCards[i].querySelector('.stop-bidding-button');
+      stopBiddingButton.style.visibility = 'hidden';
+    }
+  }
+
+  // Check the expiration time every 5 seconds
+  setInterval(function() {
+    for (var i = 0; i < productCards.length; i++) {
+      var expirationTime = productCards[i].dataset.biddingExpiration;
+      var currentTime = new Date().getTime();
+      var timeDiff = expirationTime - currentTime;
+
+      // If the time difference is negative, hide the Stop Bidding button
+      if (timeDiff < 0) {
+        var stopBiddingButton = productCards[i].querySelector('.stop-bidding-button');
+        stopBiddingButton.style.visibility = 'hidden';
+      }
+    }
+  }, 5000);
+});
+</script>

@@ -1,0 +1,87 @@
+<section class="vh-100">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-xl-11">
+        <div class="card" style="border-radius: 1rem;">
+         
+            <div class="row g-0">
+                <div class="col-md-6 col-lg-5 d-none d-md-block">
+                <!--FOR NEW BID VIEW--->
+                    <% if controller_name == 'biddings' && action_name == 'new' %>
+                    <%#= image_tag("new.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                    <% end %>
+
+                <!--FOR EDIT VIEW--->
+                    <% if controller_name == 'biddings' && action_name == 'edit' %>
+                    <%#= image_tag("edit.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                    <% end %>      
+
+                <!--FOR VIEW WITH ERRORS--->
+                    <% if @bidding.errors.any? %>
+                        <%#= image_tag("error.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                    <% end %> 
+                </div>
+
+                <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex align-items-center mb-3 pb-1">
+                            <!--FOR NEW VIEW--->
+                            <% if controller_name == 'biddings' && action_name == 'new' %>
+                                <span class="h1 fw-bold mb-0">Add Item</span>
+                            <% end %>
+
+                            <!--FOR EDIT VIEW--->
+                            <% if controller_name == 'biddings' && action_name == 'edit' %>
+                                <span class="h1 fw-bold mb-0">Edit Item</span>
+                            <% end %>
+
+                            <!--FOR EDIT VIEW--->
+                            <% if @bidding.errors.any? %>
+                                <span class="h1 fw-bold mb-0">Try Again</span>
+                            <% end %>
+                        </div>
+
+
+    HELLO <%=Current.user.username %> <br>
+    YOU ARE BIDDING FOR ITEM:  <%= @product.name %><br>
+
+
+<%= form_with(model: [@product, @bidding], local: true, data: { turbo: true }) do |form| %>
+                            <% if @bidding.errors.any? %>
+                                <div class="alert alert-danger">
+                                    <% @bidding.errors.full_messages.each do |msg| %>
+                                        <div><%= msg %></div>
+                                    <% end %>
+                                </div>
+                            <% end %>
+
+
+                        <!--[PRODUCT ID]--->
+                        <%= form.hidden_field :product_id, value: @product.id %>
+                        <!--[USER ID]--->
+                            <%= form.hidden_field :user_id, value: Current.user.id %>
+                        <!--[BID AMOUNT]--->
+                            <div class="form-outline mb-4">
+                                <%= form.label :bid_amount %><br>
+                                <%= form.number_field :bid_amount, class: "form-control" %>
+                            </div>
+
+                            <div class="mb-3">
+                                <%= form.submit "Place bid", ({:class => 'btn btn-primary'})%>
+                            </div>
+                        <% end %>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      </br>
+      </br>
+</div>
+    
+</section>
+
+
+

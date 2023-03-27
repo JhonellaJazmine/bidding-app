@@ -17,5 +17,13 @@ Rails.application.routes.draw do
   delete "logout", to: "sessions#destroy"
 
   resources :users
-  resources :products
+  resources :products do
+    resources :biddings
+  end
+
+  put '/products/:id/stop_bidding', to: 'products#stop_bidding', as: 'stop_bidding_product'
+  # get "/biddings/:id", to: "biddings#index", as:"biddings"
+  # get 'biddings/new/:id', to: 'biddings#new', as: 'new_bidding'
+  # get 'biddings/new/:id', to: 'biddings#new', as: 'custom_new_bidding'
+
 end

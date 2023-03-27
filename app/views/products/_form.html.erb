@@ -1,0 +1,129 @@
+<section class="vh-100">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-xl-11">
+        <div class="card" style="border-radius: 1rem;">
+          <div class="row g-0">
+            <div class="col-md-6 col-lg-5 d-none d-md-block">
+
+            <!--FOR NEW VIEW--->
+                  <% if controller_name == 'products' && action_name == 'new' %>
+                  <%#= image_tag("new.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                  <% end %>
+
+            <!--FOR EDIT VIEW--->
+                  <% if controller_name == 'products' && action_name == 'edit' %>
+                  <%#= image_tag("edit.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                  <% end %>      
+
+            <!--FOR VIEW WITH ERRORS--->
+            <% if product && product.errors.any? %>
+                    <%#= image_tag("error.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                  <% end %> 
+
+            </div>
+            <div class="col-md-6 col-lg-7 d-flex align-items-center">
+              <div class="card-body p-4 p-lg-5">
+
+                  <div class="d-flex align-items-center mb-3 pb-1">
+                    <!--FOR NEW VIEW--->
+                  <% if controller_name == 'products' && action_name == 'new' %>
+                    <span class="h1 fw-bold mb-0">Add Item</span>
+                  <% end %>
+
+                  <!--FOR EDIT VIEW--->
+                  <% if controller_name == 'products' && action_name == 'edit' %>
+                    <span class="h1 fw-bold mb-0">Edit Item</span>
+                  <% end %>
+
+                  <!--FOR EDIT VIEW--->
+                  <% if product && product.errors.any? %>
+                    <span class="h1 fw-bold mb-0">Try Again</span>
+                  <% end %>
+
+                  </div>
+
+
+
+
+                  <%= form_with(model: product, data: { turbo: true }) do |form| %>
+                    <% if @product && @product.errors.any? %>
+                    
+                    <div class="alert alert-danger">
+                        <% @product.errors.full_messages.each do |msg| %>
+                            <div><%= msg %></div>
+                        <% end %>
+                        </div>
+                    <% end %>
+
+                <!--[FOR AUCTIONEER]--->
+                    <% if Current.user.role == 'auctioneer' %>
+                    <!-- Display button only for role auctioneer -->
+                <!--[PRODUCT NAME]--->
+                  <div class="form-outline mb-4">
+                    <%= form.label :name %><br>
+                    <%= form.text_field :name, class: "form-control", placeholder: "Item Name" %>
+                  </div>
+                <!--[PRODUCT DESCRIPTION]--->
+                  <div class="form-outline mb-4">
+                    <%= form.label :description %><br>
+                    <%= form.text_area :description, class: "form-control", placeholder: "Description about the item..." %>
+                  </div>
+                <!--[PRODUCT LOWEST ALLOWABLE BID]--->
+                  <div class="form-outline mb-4">
+                    <%= form.label :lowest_allowable_bid %><br>
+                    <%= form.number_field :lowest_allowable_bid, class: "form-control" %>
+                  </div>
+
+                  <!--[STARTING BID PRICE]--->
+                  <div class="form-outline mb-4">
+                    <%= form.label :starting_bid_price %><br>
+                    <%= form.number_field :starting_bid_price, class: "form-control" %>
+
+                    
+                </div>
+                <!--[BID EXPIRATION]--->
+                    <%= form.label :bidding_expiration %>
+                    <%= form.datetime_local_field :bidding_expiration, class: 'form-control' %>
+                <!--[BID EXPIRATION]--->
+                    <div class="timer"></div>
+                <!--[BID IMAGE]--->
+                    <div class="form-outline mb-4">
+                    <%= form.label :image %>
+                    <%= form.file_field :image%>
+                  </div>
+
+                  <!--[USER ID OF ADMIN]--->
+                  <%= form.hidden_field :user_id, value: Current.user.id %>
+
+                  <% end %>
+
+                <!--[FOR BIDDER ONLY]--->
+                  <% if Current.user.role == 'bidder' %>
+                  <!-- Display button only for role bidder -->
+                  <!--[PRODUCT STARTING BID]--->
+                  <div class="form-outline mb-4">
+                    <%= form.label :starting_bid_price %><br>
+                    <%= form.number_field :starting_bid_price, class: "form-control" %>
+                  </div>
+                  <% end %>
+
+                  
+
+                  <div class="mb-3">
+                  <%= form.submit ({:class => 'btn btn-primary'})%>
+                  </div>
+                  <% end %>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </br>
+      </br>
+    </div>
+    
+  </div>
+
