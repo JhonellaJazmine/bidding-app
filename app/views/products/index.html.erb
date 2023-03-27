@@ -1,5 +1,7 @@
-<h1>DASHBOARD</h1>
+<div style="margin-left: 50px;"><h1>PRODUCTS</h1></div>
+<% if Current.user.role == 'auctioneer' %>
 <%= link_to 'Add Item',new_product_path, {:class => 'btn btn-outline-primary m-3'}%>
+<% end %>
 <div class="container">
 <div class="row row-cols-1 row-cols-md-3 g-4">
 <% @products.each do|product| %>

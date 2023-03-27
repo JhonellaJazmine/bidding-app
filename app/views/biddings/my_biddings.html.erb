@@ -1,0 +1,44 @@
+<div style="margin-left: 50px;"><h1>MY BIDDINGS</h1></div>
+
+
+
+
+
+
+
+
+<div class="container">
+<table class="table">
+  <thead>
+    <tr>
+      <th>Product Image</th>
+      <th>Product Name</th>
+      <th>Bid Placed</th>
+      <th>Bid Date</th>
+      <th>Bidding Status</th>
+      <th>Expiration Date</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @biddings.each do |bidding| %>
+      <tr>
+        <td><%= image_tag bidding.product.image, width: '150' %></td>
+        <td><%= bidding.product.name %></td>
+        <td><%= bidding.bid_amount %></td>
+        <td><%= bidding.created_at.strftime('%m/%d/%Y at %I:%M %p') %></td>
+        <td>
+            <% if bidding.product.bidding_allowed == true %>
+                Ongoing
+            <% else %>
+                Ended
+            <% end %>
+        
+        </td>
+        <td><%= bidding.product.bidding_expiration.strftime('%m/%d/%Y at %I:%M %p') %></td>
+        <td><%= link_to "View Product", bidding.product, class: "btn btn-outline-secondary" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>

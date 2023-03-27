@@ -25,5 +25,5 @@ Rails.application.routes.draw do
   # get "/biddings/:id", to: "biddings#index", as:"biddings"
   # get 'biddings/new/:id', to: 'biddings#new', as: 'new_bidding'
   # get 'biddings/new/:id', to: 'biddings#new', as: 'custom_new_bidding'
-
+  get 'my_biddings', to: 'biddings#my_biddings'
 end

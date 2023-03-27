@@ -39,7 +39,10 @@
     .fa-crown,
     .fa-gavel,
     .fa-money-bill,
-    .fa-arrow-down{
+    .fa-arrow-down,
+    .fa-history{
       margin-right: 10px; /* Adjust the value to your liking */
     }
-      
+    li {
+        list-style: none;
+      }

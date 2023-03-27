@@ -1,36 +1,220 @@
 <div class="container">
-<h1>This is <%=@product.name%> bidding page.</h1>
-<% if Current.user.role == 'bidder' %>
 
-<!---ASSOCIATE THE PRODUCT ID WITH THE NEW BID--->
+<div class="container">
+<div class="row">
+    <div class="col">
 
-<p><strong>ITEM: </strong><%=@product.name%></p>
-        <p class="card-text"><strong>DESCRIPTION:</strong>
-        <%=@product.description %>
-        </p>
-        <% if (Time.zone.now - @product.created_at) > 3.day %>
-          <h7 class="card-title"><%=@product.created_at.strftime("%B %d %Y")%></h7>
-        <% else %>
-          <h7 class="card-title"><%=time_ago_in_words(@product.created_at)%> ago</h7>
-        <% end %>
-      </br></br>
-      <p><strong>Lowest Allowable Bid: </strong><%= @product.lowest_allowable_bid %></p>
-      <p><strong>Starting Bid Price: </strong><%= @product.starting_bid_price%></p>
-      <p><strong>Current Lowest Bid: </strong><%= @product.current_lowest_bid%></p>
-      <p><strong>Bidding Expiration: </strong><%= @product.bidding_expiration.strftime("%B %d, %Y at %I:%M %p") %></p>
-
-<% end %>
+    <% if @product.bidding_allowed %>
   
-<h2>Bids:</h2>
-<ul>
-  <% @product.biddings.each do |bidding| %>
-    <li>
-      <%= bidding.bid_amount %> by <%= bidding.user.username %>
-    </li>
+    <li class="list-group-item">
+    <div class="d-flex justify-content-between">
+    
+    <button class="btn btn-link btn-light text-decoration-none text-success" data-bs-toggle="collapse" data-bs-target="#place-bid-section-<%= @product.id %>" aria-expanded="true" aria-controls="place-bid-section-<%= @product.id %>">
+    <h7><i class="fas fa-gavel"></i><strong>Place Bid </strong><i class="fa fa-angle-down"></i></h7>
+  </button>
+    </div>
+    <div id="place-bid-section-<%= @product.id %>" class="collapse">
+      <ul class="list-group">
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <div>
+              <% if @product.biddings.any? %>
+                <% bidding = @product.biddings.order(created_at: :desc).first %>
+                <i class="fas fa-crown"></i><strong>Current Highest Bid:</strong> <%= @product.current_lowest_bid %>
+              <% else %>
+                <strong>No bids yet</strong>
+              <% end %>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <div>
+            <i class="fa fa-arrow-down"></i><strong>Minimum Bid:</strong> <%= @product.lowest_allowable_bid %>
+            </div>
+          </div>
+        </li>
+  
+        <li class="list-group-item text-center">
+  </br>
+        <%= form_with(model: [@product, Bidding.new], local: true, data: { turbo: true }) do |form| %>
+          <% if form.object.errors.any? %>
+            <div class="alert alert-danger">
+              <% form.object.errors.full_messages.each do |msg| %>
+                <div><%= msg %></div>
+              <% end %>
+            </div>
+          <% end %>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <%= form.hidden_field :@product_id, value: @product.id %>
+              <%= form.hidden_field :user_id, value: Current.user.id %>
+              <div class="form-group">
+                <%= form.number_field :bid_amount, class: "form-control", placeholder: "Bid Must Be >= #{@product.current_lowest_bid + @product.lowest_allowable_bid}" %>
+                
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="form-group">
+                <%= form.submit "Place Bid", class: "btn btn-success btn-block" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        </li>
+      </ul>
+    </div>
+  </li>
+  
+  
   <% end %>
-</ul>
 
 
+
+
+
+
+    <div class="card h-100">
+    <div class="card-header">
+    <div class="d-flex justify-content-between">
+      <div><i class="fas fa-crown"></i><strong>Current Bid: </strong> <% if @product.biddings.any? %>
+        <% bidding = @product.biddings.order(created_at: :desc).first %>
+        <%= bidding.user.username %>
+      <% else %>
+        <td>No bids yet</td>
+      <% end %>
+      </div>
+  
+      <div class="d-flex align-items-center">
+        <div class="ml-auto"><i class="fas fa-money-bill"></i><%= @product.current_lowest_bid %></div>
+      </div>
+    </div>
+  </div>
+    <% if @product.image.attached?%>
+    <%= image_tag (@product.image), style:"height:410px;"%>
+    <% end %>
+
+
+    <div class="card-header">
+    <div class="d-flex justify-content-between">
+      <div>
+      <i class="fas fa-shopping-bag"></i><strong>Product: </strong>
+      <%=@product.name%>
+      </div>
+      <% if @product.bidding_allowed %>
+       <div class="d-flex align-items-center">
+       <i class="fas fa-stopwatch"></i>
+        <div class="timer" data-expiration-time="<%= @product.bidding_expiration %>"></div>
+      </div>
+        <% if Current.user.role == 'auctioneer' %>
+        <%= button_to "Stop Bidding", stop_bidding_product_path(product), method: :put, class: "btn btn-danger stop-bidding-button", id: "stop-bidding-button" %>
+        <% end %>
+        <% else %>
+        <div class="d-flex align-items-center">
+          <i class="fas fa-stopwatch"></i>
+          <span class="ml-2">Ended</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+
+
+
+
+
+  <ul class="list-group list-group-flush">
+
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+      <i class="fas fa-user"></i><strong>Posted by: </strong>
+      <span><%= @product.user.username %></span>
+    </div>
+    <div>
+    <i class="fas fa-gavel"></i><strong>Starting bid:</strong>
+    <%= @product.starting_bid_price%>
+    </div>
+  </li>
+
+
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+  <i class="fas fa-hourglass-end"></i></i></i>
+  <%= @product.bidding_expiration.strftime("%-m/%-d/%Y at %I:%M %p") %>
+  </div>
+  <div>
+  <i class="fa fa-arrow-down"></i><strong>Minimum bid: </strong>
+  <%= @product.lowest_allowable_bid%>
+  </div>
+</li>
+
+
+  <li class="list-group-item"><p class="card-text">
+  <i class="fas fa-align-left"></i><strong>Description: </strong>
+  <%= @product.description %>
+  </li>
+
+
+
+</div>  
+
+      </div>
+<div class="col">
+<li class="list-group-item">
+<div class="d-flex justify-content-between">
+
+<button class="btn btn-link btn-light text-decoration-none text-warning" data-bs-toggle="collapse" data-bs-target="#bid-logs-section-<%= @product.id %>" aria-expanded="true" aria-controls="place-bid-section-<%= @product.id %>">
+<h7><i class="fa fa-history"></i><strong>Bidding Log </strong><i class="fa fa-angle-down"></i></h7>
+</button>
 </div>
+
+<div id="bid-logs-section-<%= @product.id %>" class="collapse">
+  <ul class="list-group">
+    <table>
+    <thead>
+      <tr>
+        <th>Bidder Username</th>
+        <th>Bid Amount</th>
+        <th>Bid Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @product.biddings.each do |bidding| %>
+        <tr>
+          <td><%= bidding.user.username %></td>
+          <td><%= bidding.bid_amount %></td>
+          <td><%= bidding.created_at.strftime("%-m/%-d/%Y at %I:%M %p") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+
+
+
+
+    </div>
+    
+    </div>
+
+
+    
+      </div>
+
+
 </br>
-</br>
+
+
+
+
+
+  
+
+
+
+
+
+
+
+  
+

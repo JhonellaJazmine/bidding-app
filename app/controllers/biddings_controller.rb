@@ -64,7 +64,11 @@ class BiddingsController < ApplicationController
         @product.update(bidding_allowed: false)
         redirect_to products_path, notice: "Bidding has been stopped for this product."
     end
-    
+
+    def my_biddings
+        @biddings = Current.user.biddings.includes(:product).order(created_at: :desc)
+    end
+
     private
     
         def product_params
