@@ -21,9 +21,11 @@ Rails.application.routes.draw do
     resources :biddings
   end
 
+  get '/products/:id/select_winner/:product_id', to: 'products#select_winner', as: 'select_winner' 
   put '/products/:id/stop_bidding', to: 'products#stop_bidding', as: 'stop_bidding_product'
   # get "/biddings/:id", to: "biddings#index", as:"biddings"
   # get 'biddings/new/:id', to: 'biddings#new', as: 'new_bidding'
   # get 'biddings/new/:id', to: 'biddings#new', as: 'custom_new_bidding'
   get 'my_biddings', to: 'biddings#my_biddings'
+  get 'my_products', to: 'products#my_products'
 end

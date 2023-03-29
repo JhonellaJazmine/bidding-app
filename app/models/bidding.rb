@@ -20,7 +20,7 @@ validate :minimum_bid_amount
 
     min_bid = product.current_lowest_bid + product.lowest_allowable_bid
     if bid_amount < min_bid
-      errors.add(:bid_amount, "must be greater than or equal to #{min_bid}")
+      errors.add(:bid_amount, "must be greater than or equal to ₱ #{min_bid}")
     end
   end
 

@@ -1,0 +1,163 @@
+
+<div class = "container">
+<h1>YOUR PRODUCTS (<%= @user.username %>)</h1>
+
+
+<div class="container">
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Product Image</th>
+      <th>Product Name</th>
+      <th>Product Description</th>
+      <th>Starting Bid</th>
+      <th>Lowest Allowable Bid</th>
+      <th>Current Lowest Bid</th>
+      <th>Bidder Name</th>
+      <th>Bidding Status</th>
+      <th>Expiration Date</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  <% @products.each do |product| %>
+      <tr>
+        <td><%= image_tag product.image, width: '150' %></td>
+        <td><a href="<%= product_path(product) %>" style="color: blue; text-decoration: none;"><%= product.name %></a></td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <td><%= product.description %></td>
+        <td>₱<%= product.starting_bid_price %></td>
+        <td>₱<%= product.lowest_allowable_bid %></td>
+        <td>
+        <% if product.current_lowest_bid == product.starting_bid_price %>
+        No Bids Yet
+        <% else %>
+        ₱<%= product.current_lowest_bid %>
+        <% end %>
+        </td>
+        <td>
+        
+        <% if product.biddings.any? %>
+        <% bidding = product.biddings.order(created_at: :desc).first %>
+        <%= bidding.user.username %>
+      <% else %>
+        No Bidder Yet
+      <% end %>
+        
+   
+        </td>
+        <td>
+            <% if product.bidding_allowed == true %>
+                Ongoing
+            <% else %>
+                Ended
+            <% end %>
+        
+        </td>
+        <td><%= product.bidding_expiration.strftime('%m/%d/%Y at %I:%M %p') %></td>
+        
+        <td><li class="list-group-item">
+        <div class="d-flex justify-content-between">
+        
+        <button class="btn btn-link btn-light text-decoration-none text-warning" data-bs-toggle="collapse" data-bs-target="#bid-logs-section-<%= product.id %>" aria-expanded="true" aria-controls="place-bid-section-<%= product.id %>">
+        <h7><i class="fa fa-history"></i><strong>Bidding Log </strong><i class="fa fa-angle-down"></i></h7>
+        </button>
+        </div>
+        
+        <div id="bid-logs-section-<%= product.id %>" class="collapse">
+          <ul class="list-group">
+            <table>
+            <thead>
+              <tr>
+                <th>Bidder Username</th>
+                <th>Bid Amount</th>
+                <th>Bid Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% product.biddings.each do |bidding| %>
+                <tr>
+                  <td><%= bidding.user.username %></td>
+                  <td>₱<%= bidding.bid_amount %></td>
+                  <td><%= bidding.created_at.strftime("%-m/%-d/%Y %I:%M %p") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+
+            </div>
+</td>        
+<td>
+<% if product.bidding_allowed %>
+  <% if Current.user.role == 'auctioneer' %>
+  <%= button_to "Stop Bidding", select_winner_path(id: product.id, product_id: product.id), method: :get, class: "btn btn-danger stop-bidding-button", id: "stop-bidding-button" %>
+  <% end %>
+<% else %>
+<% if product.bidding_allowed %>
+<div class="alert alert-warning">
+  Bidding is still open.
+</div>
+<% elsif product.winner.nil? %>
+<div class="alert alert-warning">
+  No Winner.
+</div>
+<% else %>
+<div class="alert alert-info"><% if product.present? && !product.bidding_allowed %>
+<% if Current.user.role == 'auctioneer' %>
+  <% if product.winner %>
+    <p>Winner: <%= product.winner.user.username %></p>
+  <% else %>
+
+  <% end %>
+<% end %>
+<% end %>
+</div>
+<% end %>
+
+<% end %>
+</td>
+<td>
+<%= link_to 'Edit', edit_product_path(product), {:class => 'btn btn-light'} %>
+</td>
+        </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

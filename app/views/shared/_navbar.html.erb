@@ -8,14 +8,14 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav ms-auto", style="margin-right: 60px;">
       <li class="nav-item active" style="margin-left: 30px;">
-        <a class="nav-link" href="products">Home <span class="sr-only">.</span></a>
-      </li>
-      <li class="nav-item" style="margin-left: 30px;">
-        <a class="nav-link" href="#">About</a>
-      </li>
+      <% if Current.user %>
+      <%= link_to 'Home', products_path, class: 'nav-link' %>
+<% end %>
+      <% if !Current.user %>
       <li class="nav-item" style="margin-left: 30px;">
         <a class="nav-link" href="sign_in">Sign In</a>
       </li>
+      <% end %>
       <% if Current.user %>
       <li class="dropdown" style="margin-left: 30px;">
       <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -24,7 +24,7 @@
       
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
       <% if Current.user.role == 'auctioneer' %>
-        <li><a class="dropdown-item" href="#">My Products</a></li>
+        <li><a class="dropdown-item" href="<%= my_products_path %>">My Products</a></li>
       <% else %>
         <li><a class="dropdown-item" href="<%= my_biddings_path %>">My Biddings</a></li>
       <% end %>

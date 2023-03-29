@@ -1,6 +1,7 @@
 <% provide(:title, "Edit Toy") %>
 
-<%= link_to 'Back',products_path, {:class => 'btn btn-outline-primary'} %>
+<div style="margin-left: 50px;"><%= link_to 'Back',products_path, {:class => 'btn btn-outline-primary'} %>
+</div>
 <section class="vh-100">
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -85,7 +86,7 @@
                   </div>
                 
                     
-                </div>
+           
                 <!--[BID EXPIRATION]--->
                     <%= form.label :bidding_expiration %>
                     <%= form.datetime_local_field :bidding_expiration, class: 'form-control' %>
@@ -96,11 +97,12 @@
                     <%= form.label :image %>
                     <%= form.file_field :image%>
                   </div>
-
-                  <!--[ID OF PRODUCT]--->
-                  <%= form.hidden_field :id, value: Product.id %>
-
+                  <!--[ALLOWING BID]--->
+                  <div class="form-outline mb-4">
+                  <%= form.label :bidding_allowed %>
+                  <%= form.check_box :bidding_allowed %>
                   <% end %>
+                  </div>
 
                 <!--[FOR BIDDER ONLY]--->
                   <% if Current.user.role == 'bidder' %>
@@ -120,7 +122,7 @@
                   </div>
                   <% end %>
 
-
+                  </div>
               </div>
             </div>
           </div>

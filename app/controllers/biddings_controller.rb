@@ -1,4 +1,7 @@
 class BiddingsController < ApplicationController
+    before_action :require_user_logged_in!
+    before_action :check_role, only: [:new, :my_biddings]
+
         def index
             @product = Product.find(params[:product_id])            # @biddings = @product.biddings
             # if session[:user_id]
@@ -16,11 +19,25 @@ class BiddingsController < ApplicationController
             puts "create action called"
             @product = Product.find(params[:product_id])
             @bidding = Bidding.new(bidding_params)
+            
+            # THIS IS FOR PRODUCT SHOW
+            @bidding.product = @product # set the product for the bidding
+            
             if @bidding.save
               @product.update_current_lowest_bid(@bidding.bid_amount)
-              redirect_to products_path, notice: 'Bid was successfully placed.'
+            #   redirect_to products_path, notice: 'Bid was successfully placed.'
+            # else
+            #   render :new, status: 422
+            # end
+            
+            # redirect to the appropriate page based on where the bid was placed
+            if request.referrer == product_url(@product)
+                redirect_to @product, notice: 'Bid was successfully placed.'
             else
-              render :new, status: 422
+                redirect_to products_path, notice: 'Bid was successfully placed.'
+            end
+            else
+            render :new, status: 422
             end
           end
 
@@ -83,9 +100,14 @@ class BiddingsController < ApplicationController
         #     params.require(:bidding).permit(:bid_amount).merge(product_id: params[:product_id], user_id: current_user.id)
         #   end
 
-        def set_micropost
-            @product = Product.find(params[:id])
-        end
+        # def set_micropost
+        #     @product = Product.find(params[:id])
+        # end
    
+        def check_role
+            unless Current.user&.bidder?
+              redirect_to products_path, alert: "You are not authorized to access this page."
+            end
+          end
     
 end

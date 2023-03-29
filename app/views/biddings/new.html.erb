@@ -8,17 +8,18 @@
                 <div class="col-md-6 col-lg-5 d-none d-md-block">
                 <!--FOR NEW BID VIEW--->
                     <% if controller_name == 'biddings' && action_name == 'new' %>
-                    <%#= image_tag("new.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                    <%= image_tag("bid.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
                     <% end %>
 
                 <!--FOR EDIT VIEW--->
                     <% if controller_name == 'biddings' && action_name == 'edit' %>
-                    <%#= image_tag("edit.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                    <%#= image_tag("bid.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
                     <% end %>      
 
                 <!--FOR VIEW WITH ERRORS--->
                     <% if @bidding.errors.any? %>
-                        <%#= image_tag("error.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                    <%= image_tag (@product.image), class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;"%>
+                       
                     <% end %> 
                 </div>
 
@@ -42,9 +43,16 @@
                         </div>
 
 
-    HELLO <%=Current.user.username %> <br>
-    YOU ARE BIDDING FOR ITEM:  <%= @product.name %><br>
+    <strong>YOU ARE BIDDING FOR ITEM:  <%= @product.name %></strong><br>
+    <% if @product.biddings.any? %>
+      <% bidding = @product.biddings.order(created_at: :desc).first %>
+      <i class="fas fa-crown"></i><strong>Current Highest Bid:</strong> ₱<%= @product.current_lowest_bid %>
+    <% else %>
+      <strong>No bids yet</strong>
+    <% end %>
+</br>
 
+  <i class="fa fa-arrow-down"></i><strong>Minimum Bid:</strong> ₱<%= @product.lowest_allowable_bid %>
 
 <%= form_with(model: [@product, @bidding], local: true, data: { turbo: true }) do |form| %>
                             <% if @bidding.errors.any? %>
@@ -67,7 +75,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <%= form.submit "Place bid", ({:class => 'btn btn-primary'})%>
+                                <%= form.submit "Place bid", ({:class => 'btn btn-success'})%>
                             </div>
                         <% end %>
 

@@ -1,7 +1,7 @@
-<div style="margin-left: 50px;"><h1>PRODUCTS</h1></div>
+<div style="margin-left: 50px;"><h1>PRODUCTS</h1>
 <% if Current.user.role == 'auctioneer' %>
 <%= link_to 'Add Item',new_product_path, {:class => 'btn btn-outline-primary m-3'}%>
-<% end %>
+<% end %></div>
 <div class="container">
 <div class="row row-cols-1 row-cols-md-3 g-4">
 <% @products.each do|product| %>
@@ -10,17 +10,39 @@
     <div class="card h-100">
     <div class="card-header">
     <div class="d-flex justify-content-between">
+    <% if product.bidding_allowed %>
+    <% if product.biddings.any? %>
       <div><i class="fas fa-crown"></i><strong>Current Bid: </strong> <% if product.biddings.any? %>
         <% bidding = product.biddings.order(created_at: :desc).first %>
         <%= bidding.user.username %>
+        
       <% else %>
         <td>No bids yet</td>
       <% end %>
       </div>
+      <% end %>
+      <div class="d-flex align-items-center">
+        <div class="ml-auto"><i class="fas fa-money-bill"></i>₱<%= product.current_lowest_bid %></div>
+      </div>
+
+      <% else %>
+      <% if product.biddings.any? %>
+      <div><i class="fas fa-crown"></i><strong>Winner: </strong> <% if product.biddings.any? %>
+        <% bidding = product.biddings.order(created_at: :desc).first %>
+        <%= bidding.user.username %>
+      <% end %>
+      </div>
   
       <div class="d-flex align-items-center">
-        <div class="ml-auto"><i class="fas fa-money-bill"></i><%= product.current_lowest_bid %></div>
+        <div class="ml-auto"><i class="fas fa-money-bill"></i>₱<%= product.current_lowest_bid %></div>
       </div>
+
+      <% else %>
+
+      <div><strong>No winner </strong>
+    </div>
+      <% end %>
+      <% end %>
     </div>
   </div>
     <% if product.image.attached?%>
@@ -30,17 +52,22 @@
 
     <div class="card-header">
     <div class="d-flex justify-content-between">
-      <div>
-      <i class="fas fa-shopping-bag"></i><strong>Product: </strong>
-      <%=product.name%>
-      </div>
+    <div>
+    <a href="<%= product_path(product) %>" style="color: blue; text-decoration: none;"><div>
+    <i class="fas fa-shopping-bag"></i><strong>Product: </strong>
+    <%= product.name %>
+  </div></a>
+  
+  </div>
       <% if product.bidding_allowed %>
        <div class="d-flex align-items-center">
        <i class="fas fa-stopwatch"></i>
         <div class="timer" data-expiration-time="<%= product.bidding_expiration %>"></div>
       </div>
+      <% if product.user == Current.user %>
         <% if Current.user.role == 'auctioneer' %>
         <%= button_to "Stop Bidding", stop_bidding_product_path(product), method: :put, class: "btn btn-danger stop-bidding-button", id: "stop-bidding-button" %>
+        <% end %>
         <% end %>
         <% else %>
         <div class="d-flex align-items-center">
@@ -65,7 +92,7 @@
     </div>
     <div>
     <i class="fas fa-gavel"></i><strong>Starting bid:</strong>
-    <%= product.starting_bid_price%>
+    ₱<%= product.starting_bid_price%>
     </div>
   </li>
 
@@ -77,7 +104,7 @@
   </div>
   <div>
   <i class="fa fa-arrow-down"></i><strong>Minimum bid: </strong>
-  <%=product.lowest_allowable_bid%>
+  ₱<%=product.lowest_allowable_bid%>
   </div>
 </li>
 
@@ -86,6 +113,9 @@
   <i class="fas fa-align-left"></i><strong>Description: </strong>
   <%=product.description %>
   </li>
+
+
+  <% if Current.user.role == 'bidder' %>
 
   <% if product.bidding_allowed %>
   
@@ -103,7 +133,7 @@
           <div>
             <% if product.biddings.any? %>
               <% bidding = product.biddings.order(created_at: :desc).first %>
-              <i class="fas fa-crown"></i><strong>Current Highest Bid:</strong> <%= product.current_lowest_bid %>
+              <i class="fas fa-crown"></i><strong>Current Highest Bid:</strong> ₱<%= product.current_lowest_bid %>
             <% else %>
               <strong>No bids yet</strong>
             <% end %>
@@ -113,7 +143,7 @@
       <li class="list-group-item">
         <div class="d-flex justify-content-between">
           <div>
-          <i class="fa fa-arrow-down"></i><strong>Minimum Bid:</strong> <%= product.lowest_allowable_bid %>
+          <i class="fa fa-arrow-down"></i><strong>Minimum Bid:</strong> ₱<%= product.lowest_allowable_bid %>
           </div>
         </div>
       </li>
@@ -133,7 +163,7 @@
             <%= form.hidden_field :product_id, value: product.id %>
             <%= form.hidden_field :user_id, value: Current.user.id %>
             <div class="form-group">
-              <%= form.number_field :bid_amount, class: "form-control", placeholder: "Bid Must Be >= #{product.current_lowest_bid + product.lowest_allowable_bid}" %>
+              <%= form.number_field :bid_amount, class: "form-control", placeholder: "Bid Must Be >= ₱ #{product.current_lowest_bid + product.lowest_allowable_bid}" %>
               
             </div>
           </div>
@@ -152,7 +182,7 @@
 
 <% end %>
 
-
+<% end %>
 
 
 
@@ -270,39 +300,4 @@
 
 <%= javascript_include_tag ("timer.js")%>
 
-<script>
 
-$(document).on('turbo:load', function() {
-  // Get all product cards on the page
-  console.log('Turbo loaded!');
-  var productCards = document.querySelectorAll('.product-card');
-
-  // Loop through each product card and check the expiration time
-  for (var i = 0; i < productCards.length; i++) {
-    var expirationTime = productCards[i].dataset.biddingExpiration;
-    var currentTime = new Date().getTime();
-    var timeDiff = expirationTime - currentTime;
-
-    // If the time difference is negative, hide the Stop Bidding button
-    if (timeDiff < 0) {
-      var stopBiddingButton = productCards[i].querySelector('.stop-bidding-button');
-      stopBiddingButton.style.visibility = 'hidden';
-    }
-  }
-
-  // Check the expiration time every 5 seconds
-  setInterval(function() {
-    for (var i = 0; i < productCards.length; i++) {
-      var expirationTime = productCards[i].dataset.biddingExpiration;
-      var currentTime = new Date().getTime();
-      var timeDiff = expirationTime - currentTime;
-
-      // If the time difference is negative, hide the Stop Bidding button
-      if (timeDiff < 0) {
-        var stopBiddingButton = productCards[i].querySelector('.stop-bidding-button');
-        stopBiddingButton.style.visibility = 'hidden';
-      }
-    }
-  }, 5000);
-});
-</script>
