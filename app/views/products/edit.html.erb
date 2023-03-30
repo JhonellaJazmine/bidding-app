@@ -12,17 +12,17 @@
 
             <!--FOR NEW VIEW--->
                   <% if controller_name == 'products' && action_name == 'new' %>
-                  <%#= image_tag("new.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                  <%= image_tag("bid.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
                   <% end %>
 
             <!--FOR EDIT VIEW--->
                   <% if controller_name == 'products' && action_name == 'edit' %>
-                  <%#= image_tag("edit.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                  <%= image_tag("bid.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
                   <% end %>      
 
             <!--FOR VIEW WITH ERRORS--->
             <% if @product.errors.any? %>
-                    <%#= image_tag("error.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
+                    <%= image_tag("bid.png", class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
                   <% end %> 
 
             </div>
