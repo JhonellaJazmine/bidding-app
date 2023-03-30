@@ -1,0 +1,18 @@
+databases:
+  - name: bidding_app_nella
+    databaseName: bidding_app_nella
+    user: bidding_app_nella_user
+
+services:
+  - type: web
+    name: bidding_app_nella
+    env: ruby
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bidding_app_nella
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
