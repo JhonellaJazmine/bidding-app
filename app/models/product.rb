@@ -3,18 +3,16 @@ class Product < ApplicationRecord
     # before_save :set_current_lowest_bid
     after_create :set_initial_current_lowest_bid
 
-    validates :image, content_type: { in:
-    %w(.jpeg .png .jpg), message: 'must be in JPG, JPEG, or PNG format'}
+    
   def set_initial_current_lowest_bid
     self.current_lowest_bid = self.starting_bid_price
     self.save
   end
 
     belongs_to :user
-    has_many :biddings
-    validates :name, :description, :image, :lowest_allowable_bid, :starting_bid_price, :bidding_expiration, 
+    has_many :biddings, dependent: :destroy
+    validates :name, :description, :lowest_allowable_bid, :starting_bid_price, :bidding_expiration, 
     presence: true
-    has_one_attached :image
 
 
     validate :validate_bidding_allowed

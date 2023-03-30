@@ -22,7 +22,7 @@
   <tbody>
   <% @products.each do |product| %>
       <tr>
-        <td><%= image_tag product.image, width: '150' %></td>
+        <td> <%= cl_image_tag(product.image_url, width: 150) %></td>
         <td><a href="<%= product_path(product) %>" style="color: blue; text-decoration: none;"><%= product.name %></a></td>
 
 
@@ -130,6 +130,9 @@
 </td>
 <td>
 <%= link_to 'Edit', edit_product_path(product), {:class => 'btn btn-light'} %>
+</td>
+<td>
+<%= link_to "Delete", product, :class => 'btn btn-warning', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %>
 </td>
         </tr>
     <% end %>

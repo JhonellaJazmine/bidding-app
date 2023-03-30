@@ -113,9 +113,8 @@
       <% end %>
     </div>
   </div>
-    <% if @product.image.attached?%>
-    <%= image_tag (@product.image), style:"height:410px;"%>
-    <% end %>
+
+    <%= cl_image_tag(@product.image_url, height: 410) %>
 
 
     <div class="card-header">

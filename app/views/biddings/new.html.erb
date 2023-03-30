@@ -18,8 +18,7 @@
 
                 <!--FOR VIEW WITH ERRORS--->
                     <% if @bidding.errors.any? %>
-                    <%= image_tag (@product.image), class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;"%>
-                       
+                    <%= cl_image_tag(@product.image_url, class: "img-fluid", style: "border-radius: 1rem 0 0 1rem;") %>
                     <% end %> 
                 </div>
 

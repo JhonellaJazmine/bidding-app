@@ -23,7 +23,7 @@
   <tbody>
     <% @biddings.each do |bidding| %>
       <tr>
-        <td><%= image_tag bidding.product.image, width: '150' %></td>
+        <td><%= cl_image_tag(bidding.product.image_url, width: 150) %></td>
         <td><%= bidding.product.name %></td>
         <td>₱<%= bidding.bid_amount %></td>
         <td><%= bidding.created_at.strftime('%m/%d/%Y at %I:%M %p') %></td>

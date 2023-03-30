@@ -18,13 +18,22 @@ class ProductsController < ApplicationController
     end
 
     def create
-        @product = Product.new(product_params)
+        begin
+            result = Cloudinary::Uploader.upload(params[:product][:image], use_filename: true, unique_filename: false)
+          rescue CloudinaryException => e
+            flash[:alert] = "#{e.message}. Must be a JPG, JPEG, or PNG file"
+            redirect_to new_product_path and return
+          end
+          
+          @product = Product.new(product_params(result))
+          @product.image_url = result['secure_url']
         if @product.save 
-            redirect_to products_path, notice: 'Product has been created successfully.'
+          redirect_to products_path, notice: 'Product has been created successfully.'
         else
-            render :new, status: 422
+          render :new, status: 422
         end
-    end
+      end
+      
 
     def show
         @product = Product.find(params[:id])
@@ -62,7 +71,13 @@ end
 
 def update
     @product = Product.find(params[:id])
-    if @product.update(product_params)
+    begin
+        result = Cloudinary::Uploader.upload(params[:product][:image], use_filename: true, unique_filename: false)
+      rescue CloudinaryException => e
+        flash[:alert] = "#{e.message}. Must be a JPG, JPEG, or PNG file"
+        redirect_to edit_product_path and return
+      end
+    if @product.update(product_params(result))
         redirect_to products_path, notice: 'Product has been updated successfully.'
     else
         render :edit, status: 422
@@ -70,10 +85,12 @@ def update
 end
 
 def destroy
+    @product = Product.find(params[:id])
     if @product.user != Current.user
-        redirect_to products_path, notice: 'unauthorized access!'
-    else @product.destroy
-        redirect_to products_path, notice: 'Product has been deleted successfully.'
+        redirect_to request.referer, notice: 'unauthorized access!'
+    else
+      @product.destroy
+      redirect_to request.referer, notice: 'Product has been deleted successfully.'
     end
 end
 
@@ -85,12 +102,11 @@ end
 
 
 
-
 private
 
-    def product_params
-        params.require(:product).permit(:name, :description, :lowest_allowable_bid, :starting_bid_price, :current_lowest_bid, :bidding_expiration, :image, :user_id, :bidding_allowed)
-    end
+def product_params(result)
+    params.require(:product).permit(:name, :description, :lowest_allowable_bid, :starting_bid_price, :bidding_expiration, :current_lowest_bid, :bidding_allowed, :user_id).merge(image_url: result['secure_url'])
+  end
 
     # def set_micropost
     #     @product = Product.find(params[:id])
